@@ -1,0 +1,5 @@
+pymongo~=4.5.0
+requests~=2.31.0
+pytest~=7.4.0
+flask~=2.3.3
+Flask-JWT-Extended~=4.5.2

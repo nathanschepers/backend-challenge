@@ -31,6 +31,8 @@ pip-delete-this-directory.txt
 .cache
 nosetests.xml
 coverage.xml
+.pytest_cache/
+.mypy_cache/
 
 # Translations
 *.mo
@@ -51,8 +53,9 @@ coverage.xml
 docs/_build/
 
 .idea/
-.pytest_cache/
 
 # poetry
 poetry.lock
 .venv
+
+.env.sh.local

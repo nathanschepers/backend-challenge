@@ -1,0 +1,69 @@
+version: '3'
+
+services:
+
+  mongodb:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: mongouser
+      MONGO_INITDB_ROOT_PASSWORD: mongopass
+
+  mongo-express:
+    image: mongo-express
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+    environment:
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=mongouser
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=mongopass
+      - ME_CONFIG_MONGODB_SERVER=mongodb
+    depends_on:
+      - mongodb
+
+  app:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile
+    ports:
+      - "5000:5000"
+    depends_on:
+      - mongodb
+    command: ["python", "./app.py"]
+
+  init:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile
+    depends_on:
+      - mongodb
+    profiles:
+      - init
+    restart: "no"
+    command: ["python", "./init.py"]
+
+  unittest:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile
+    profiles:
+      - unittest
+    restart: "no"
+    command: ["python", "-m", "pytest", "tests/unit/"]
+
+  apitest:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile
+    profiles:
+      - apitest
+    depends_on:
+      - app
+    restart: "no"
+    command: ["python", "-m", "pytest", "tests/api/"]
+
+volumes:
+  mongo-data:
